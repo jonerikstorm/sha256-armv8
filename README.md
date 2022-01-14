@@ -1,6 +1,6 @@
-# Fork
+# macOS SHA2-256 ARM64v8 Assembly Library
 
-This is a fork, optimized for use on macOS and reverse-engineered for some documentation. It adds a library
+This is a fork of work by @jocover, optimized for use on macOS and reverse-engineered for some documentation. It adds a library
 written in standard C. It is based on the ARM assembly code from http://github.com/jocover/sha256-armv8 which
 at the time this was written, had no license. All of my commits are subject to GPLv3 and my copyright.
 
