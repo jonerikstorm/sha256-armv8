@@ -1,14 +1,27 @@
-
+// Based on https://github.com/jocover/sha256-armv8
+// Subsequent commits are subject to GPL3.
+// and are (c) Jon-Erik G. Storm, all other rights reserved.
+//
+// void sha256_block_data_order(unsigned char* digest, unsigned char* message, uint64_t blockCount);
+//
+// * This stores a pointer to digest in x0, a pointer to message in x1, and integer number of 
+// 512-bit blocks are in the message.
+//
+// * This function may also be called blockCount times with the same pointer to digest and the pointer
+// to message incremented 0x40=64 bytes=512-bits, while leaving blockCount at 1, as in the original sample code.
+//
 .text
-.arch   armv8-a+crypto
 
-# SHA256 assembly implementation for ARMv8 AArch64
+.global    _sha256_block_data_order ; leading underscore for macOS ABI
+.p2align  2 ; alignment required by macOS
+_sha256_block_data_order: ; leading underscore for macOS ABI
 
-.global	sha256_block_data_order
-.type	sha256_block_data_order,%function
-.align  2
-sha256_block_data_order:
-
+; This initial routine stores the registers that the callee is
+; responsible for using that the routine will clobber and load 
+; a series of constants totaling 2,048 bits used in the SHA2-256 algorithm.
+; The caller is also responsible for having loaded the SHA2-256 initial
+; state constants into the 32 bytes x8 = 256 bit digest buffer. 
+;
 .Lsha256prolog:
 
     stp       x29, x30, [sp,#-64]!
@@ -25,19 +38,33 @@ sha256_block_data_order:
     str       q9, [sp, #32]
     str       q10, [sp, #48]
     ld1       {v28.4s-v31.4s}, [x3], #64
-    
-.Lsha256loop:
 
+; This loop runs the number of times in blockCount(x2)
+;
+.Lsha256loop:
+    
+    ; Load the message block into the vector registers
+    ; The #64 incements x1 one 512-bit block length
+    ; At the end of the loop, x1 is compared with
+    ; x2, which was loaded with the address of the
+    ; original buffer plus 512*the number of blocks above
+    ; If it's the last block, the test results in a zero flag
+    ; resulting in exiting the loop
     ld1       {v5.16b-v8.16b}, [x1], #64
+    
+    ; Move the digest into work registers
     mov       v2.16b, v0.16b
     mov       v3.16b, v1.16b
 
+    ; Reverse endianness
     rev32     v5.16b, v5.16b
     rev32     v6.16b, v6.16b
     add       v9.4s, v5.4s, v16.4s
     rev32     v7.16b, v7.16b
     add       v10.4s, v6.4s, v17.4s
     mov       v4.16b, v2.16b
+    
+    ; Using ARM hardware features in each round
     sha256h   q2, q3, v9.4s
     sha256h2  q3, q4, v9.4s
     sha256su0 v5.4s, v6.4s
@@ -124,22 +151,36 @@ sha256_block_data_order:
     mov       v4.16b, v2.16b
     sha256h   q2, q3, v10.4s
     sha256h2  q3, q4, v10.4s
+    ; The load above incements x1 one 512-bit block length
+    ; Here, x1 is compared with
+    ; x2, which was loaded with the address of the
+    ; original buffer plus 512*the number of blocks above
+    ; If it's the last block, the test results in a zero flag
+    ; resulting in exiting the loop
     cmp       x1, x2
     add       v1.4s, v1.4s, v3.4s
     add       v0.4s, v0.4s, v2.4s
+    ; If there is still a difference between the message pointer
+    ; and the calculated end of its buffer, loop again.
     b.ne      .Lsha256loop
 
 .Lsha256epilog:
-
+    
+    ;   "Publish" the digest results in the digest buffer in memory.
     st1       {v0.4s,v1.4s}, [x0]
+    ;   Pop back the clobbered register we're responsible for saving.
     ldr       q10, [sp, #48]
     ldr       q9, [sp, #32]
     ldr       q8, [sp, #16]
     ldr       x29, [sp], #64
+    ; return to caller
     ret
 
 .align  5
 .LKConstant256:
+; These are the constants used by the algorithm that
+; we load directly into *HALF* of the vector register
+; file. It's worth it.
 .word   0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5
 .word   0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5
 .word   0xd807aa98,0x12835b01,0x243185be,0x550c7dc3
@@ -157,7 +198,6 @@ sha256_block_data_order:
 .word   0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208
 .word   0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 
-.size   sha256_block_data_order,.-sha256_block_data_order
 .align	2
 
 
