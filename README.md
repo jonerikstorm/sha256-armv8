@@ -2,7 +2,7 @@
 
 This is a fork of work by @jocover, optimized for use on macOS and reverse-engineered for some documentation. It adds a library
 written in standard C. It is based on the ARM assembly code from http://github.com/jocover/sha256-armv8 which
-at the time this was written, had no license. All 32-bit code has been removed.
+from the time this was written until the time this was written, had no license. All 32-bit code has been removed.
 
 All of my commits are subject to GPLv3 and my copyright.
 
