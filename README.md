@@ -1,3 +1,7 @@
+# Fork
+
+This is a fork, optimized for use on macOS and reverse-engineered for some documentation.
+
 # SHA-256
 
 This is a very basic implementation of a SHA-256 hash according to the [FIPS
