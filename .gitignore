@@ -1,0 +1,5 @@
+*.o
+*.a
+*.dSYM/
+sha256-armv8-test
+sha256-armv8-test-commoncrypto

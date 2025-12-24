@@ -1,50 +1,30 @@
-# macOS SHA2-256 ARM64v8 Assembly Library
+# sha256-armv8 (macOS arm64)
 
-This is a fork of work by @jocover, optimized for use on macOS and reverse-engineered for some documentation. It adds a library
-written in standard C. It is based on the ARM assembly code from http://github.com/jocover/sha256-armv8 which
-from the time this was written until the time this was written, had no license. All 32-bit code has been removed.
+SHA-256 compression function implemented in AArch64 using ARMv8 Crypto Extensions, plus a small C wrapper that provides a correct, binary-safe SHA-256 API (single-shot + streaming).
 
-All of my commits are subject to GPLv3 and my copyright.
+## Requirements
 
+- macOS arm64 (Apple Silicon).
+- ARMv8 crypto extension support (`sha256h`, `sha256h2`, `sha256su0`, `sha256su1`).
+- `clang` (Xcode Command Line Tools).
 
-Created by Jon-Erik Storm on 12/26/21.
+## Build and test
 
-Library based on jocover's sha256-armv8 assembly code.
-
-Copyright (C) 2021, 2022 Jon-Erik G. Storm
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-The original author's README.md is below:
-
-# SHA-256
-
-This is a very basic implementation of a SHA-256 hash according to the [FIPS
-180-4 standard](http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf)
-in C. I did it for educational purposes, the code is not optimized at all, but
-(almost) corresponds line by line to the standard.
-
-The algorithm to process a small block of data is quite simple and very well
-described in the standard. I found that correctly implementing the padding is
-much harder.
-
-It does not have any dependencies (except for the C standard library of course)
-and can be compiled with `make`. When `sha256sum` is installed, a short test can
-be run with `make test`.
-
-Usage:
-
+```sh
+make
+make test
 ```
-./main <input file>
-```
+
+This builds `libsha256-armv8.a` and runs `sha256-armv8-test` against FIPS 180-4 test vectors.
+
+## API
+
+The header is `libsha256-armv8.h`.
+
+- One-shot: `sha256_armv8(const void *data, size_t len, uint8_t out[32])`
+- Streaming: `sha256_armv8_init` / `sha256_armv8_update` / `sha256_armv8_final`
+- Hex encoding: `sha256_armv8_to_hex(const uint8_t digest[32], char out_hex[65])`
+
+## License / provenance
+
+This repository is GPL-3.0 (see `LICENSE`). The assembly is based on `jocover/sha256-armv8`; if you plan to redistribute this code, audit upstream provenance/licensing for your use case.

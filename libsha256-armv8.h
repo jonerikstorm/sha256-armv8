@@ -17,15 +17,42 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef _LIBSHA265ARM64__N
-#define _LIBSHA265ARM64__N
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<string.h>
+#ifndef LIBSHA256_ARMV8_H
+#define LIBSHA256_ARMV8_H
 
-void sha256_block_data_order(uint32_t *ctx, const void *in, size_t num);
-void sha256(uint32_t* hash, unsigned char** message, uint64_t len, _Bool safe, _Bool switchEndianness);
-const char* sha256_hex(unsigned char * message);
-const char* sha256_str(unsigned char * message);
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum {
+    SHA256_ARMV8_BLOCK_BYTES = 64,
+    SHA256_ARMV8_DIGEST_BYTES = 32,
+    SHA256_ARMV8_HEX_BYTES = 64,
+};
+
+typedef struct sha256_armv8_ctx {
+    uint32_t state[8];
+    uint64_t bitlen;
+    uint8_t buffer[SHA256_ARMV8_BLOCK_BYTES];
+    size_t buffer_len;
+} sha256_armv8_ctx;
+
+void sha256_block_data_order(uint32_t *state, const void *data, size_t blocks);
+
+void sha256_armv8_init(sha256_armv8_ctx *ctx);
+void sha256_armv8_update(sha256_armv8_ctx *ctx, const void *data, size_t len);
+void sha256_armv8_final(sha256_armv8_ctx *ctx, uint8_t out[SHA256_ARMV8_DIGEST_BYTES]);
+
+void sha256_armv8(const void *data, size_t len, uint8_t out[SHA256_ARMV8_DIGEST_BYTES]);
+void sha256_armv8_to_hex(
+    const uint8_t digest[SHA256_ARMV8_DIGEST_BYTES],
+    char out_hex[SHA256_ARMV8_HEX_BYTES + 1]);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
