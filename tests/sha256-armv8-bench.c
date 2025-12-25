@@ -120,7 +120,7 @@ static int bench_size(const uint8_t *buf, size_t len, uint64_t target_ns) {
 int main(void) {
     const uint64_t target_ns = 250ull * 1000ull * 1000ull;
 
-    const size_t sizes[] = {64, 256, 1024, 8192, 65536, 1u << 20};
+    const size_t sizes[] = {64, 80, 256, 1024, 8192, 65536, 1u << 20};
     const size_t max_len = sizes[sizeof(sizes) / sizeof(sizes[0]) - 1];
 
     uint8_t *buf = (uint8_t *)malloc(max_len);
