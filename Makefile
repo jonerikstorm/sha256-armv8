@@ -9,6 +9,7 @@ OBJS := libsha256-armv8.o sha256-armv8-aarch64.o
 
 .PHONY: all clean test
 .PHONY: test-commoncrypto
+.PHONY: bench
 
 all: $(LIB)
 
@@ -34,6 +35,12 @@ sha256-armv8-test-commoncrypto: tests/sha256-armv8-test-commoncrypto.c $(LIB)
 test-commoncrypto: sha256-armv8-test-commoncrypto
 	./sha256-armv8-test-commoncrypto
 
+sha256-armv8-bench: tests/sha256-armv8-bench.c $(LIB)
+	$(CC) $(CFLAGS) -I. tests/sha256-armv8-bench.c $(LIB) -o $@
+
+bench: sha256-armv8-bench
+	./sha256-armv8-bench
+
 clean:
-	rm -f $(OBJS) $(LIB) sha256-armv8-test sha256-armv8-test-commoncrypto
+	rm -f $(OBJS) $(LIB) sha256-armv8-test sha256-armv8-test-commoncrypto sha256-armv8-bench
 	rm -rf sha256-armv8-test.dSYM

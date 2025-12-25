@@ -3,3 +3,4 @@
 *.dSYM/
 sha256-armv8-test
 sha256-armv8-test-commoncrypto
+sha256-armv8-bench

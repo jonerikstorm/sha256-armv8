@@ -17,6 +17,13 @@ make test
 
 This builds `libsha256-armv8.a` and runs `sha256-armv8-test` against FIPS 180-4 test vectors.
 
+Optional:
+
+```sh
+make test-commoncrypto
+make bench
+```
+
 ## API
 
 The header is `libsha256-armv8.h`.
