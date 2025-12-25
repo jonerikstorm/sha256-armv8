@@ -10,6 +10,7 @@ OBJS := libsha256-armv8.o sha256-armv8-aarch64.o
 .PHONY: all clean test
 .PHONY: test-commoncrypto
 .PHONY: bench
+.PHONY: bench-asm-permutations
 
 all: $(LIB)
 
@@ -40,6 +41,9 @@ sha256-armv8-bench: tests/sha256-armv8-bench.c $(LIB)
 
 bench: sha256-armv8-bench
 	./sha256-armv8-bench
+
+bench-asm-permutations:
+	python3 tools/bench-asm-permutations.py
 
 clean:
 	rm -f $(OBJS) $(LIB) sha256-armv8-test sha256-armv8-test-commoncrypto sha256-armv8-bench

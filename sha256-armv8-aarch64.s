@@ -13,7 +13,7 @@
 .text
 
 .global    _sha256_block_data_order ; leading underscore for macOS ABI
-.p2align  2 ; alignment required by macOS
+.p2align  5 ; alignment required by macOS
 _sha256_block_data_order: ; leading underscore for macOS ABI
 
 ; This initial routine stores the registers that the callee is
@@ -24,23 +24,21 @@ _sha256_block_data_order: ; leading underscore for macOS ABI
 ;
 .Lsha256prolog:
 
-    stp       x29, x30, [sp,#-64]!
-    mov       x29, sp
+    sub       sp, sp, #48
     adr       x3, .LKConstant256
-    str       q8, [sp, #16]
+    str       q8, [sp, #0]
     ld1       {v16.4s-v19.4s}, [x3], #64
-    ld1       {v0.4s}, [x0], #16
+    ld1       {v0.4s,v1.4s}, [x0]
     ld1       {v20.4s-v23.4s}, [x3], #64
     add       x2, x1, x2, lsl #6
-    ld1       {v1.4s}, [x0]
     ld1       {v24.4s-v27.4s}, [x3], #64
-    sub       x0, x0, #16
-    str       q9, [sp, #32]
-    str       q10, [sp, #48]
+    str       q9, [sp, #16]
+    str       q10, [sp, #32]
     ld1       {v28.4s-v31.4s}, [x3], #64
 
 ; This loop runs the number of times in blockCount(x2)
 ;
+.p2align  5
 .Lsha256loop:
     
     ; Load the message block into the vector registers
@@ -169,10 +167,10 @@ _sha256_block_data_order: ; leading underscore for macOS ABI
     ;   "Publish" the digest results in the digest buffer in memory.
     st1       {v0.4s,v1.4s}, [x0]
     ;   Pop back the clobbered register we're responsible for saving.
-    ldr       q10, [sp, #48]
-    ldr       q9, [sp, #32]
-    ldr       q8, [sp, #16]
-    ldr       x29, [sp], #64
+    ldr       q10, [sp, #32]
+    ldr       q9, [sp, #16]
+    ldr       q8, [sp, #0]
+    add       sp, sp, #48
     ; return to caller
     ret
 
@@ -199,5 +197,3 @@ _sha256_block_data_order: ; leading underscore for macOS ABI
 .word   0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 
 .align	2
-
-
