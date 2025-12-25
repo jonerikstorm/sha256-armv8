@@ -2,7 +2,7 @@
 
 SHA-256 compression function implemented in AArch64 using ARMv8 Crypto Extensions, plus a small C wrapper that provides a correct, binary-safe SHA-256 API (single-shot + streaming).
 
-This route is *382%* faster than commoncrypto at the size of a bitcoin hash, as tested on an M4 Mac.
+This code is *382%* faster than commoncrypto at the size of a bitcoin hash, as tested on an M4 Mac.
 
 ## Requirements
 
